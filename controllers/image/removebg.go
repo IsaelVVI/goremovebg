@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"bytes"
+	"encoding/base64"
 	"io"
 	"net/http"
 	"os"
@@ -45,7 +46,9 @@ func HandleRemovebg(ctx *gin.Context) {
 
 	logger.Debug("Success in Read File")
 
-	newfile, err := removebg(fileBytes, ctx)
+	newfile, err := removebg(fileBytes)
+
+	logger.Debug("passou do newfile")
 
 	if err != nil {
 		logger.Errorf("Error in Read File: %v", err.Error())
@@ -55,17 +58,17 @@ func HandleRemovebg(ctx *gin.Context) {
 
 	// convert file to base64
 
-	// filebase64 := base64.StdEncoding.EncodeToString([]byte(newfile))
+	filebase64 := base64.StdEncoding.EncodeToString([]byte(newfile))
 
-	// ctx.JSON(http.StatusOK, gin.H{
-	// 	"Message": "Sucesso!",
-	// 	"file":    filebase64,
-	// })
+	ctx.JSON(http.StatusOK, gin.H{
+		"message": "Sucesso!",
+		"file":    filebase64,
+	})
 
-	ctx.Data(http.StatusOK, http.DetectContentType([]byte(newfile)), []byte(newfile))
+	// ctx.Data(http.StatusOK, http.DetectContentType([]byte(newfile)), []byte(newfile))
 }
 
-func removebg(file []byte, ctx *gin.Context) (string, error) {
+func removebg(file []byte) (string, error) {
 
 	// url request
 	url := os.Getenv("URL") + "computervision/imageanalysis:segment?api-version=2023-02-01-preview&mode=backgroundRemoval"
