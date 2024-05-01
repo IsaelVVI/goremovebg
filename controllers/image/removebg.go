@@ -43,7 +43,7 @@ func HandleRemovebg(ctx *gin.Context) {
 		return
 	}
 
-	logger.Debugf("Success in Read File: %v", fileBytes)
+	logger.Debug("Success in Read File")
 
 	newfile, err := removebg(fileBytes, ctx)
 
@@ -53,11 +53,16 @@ func HandleRemovebg(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{
-		"Message": "Sucesso!!",
-		// "File":    fileBytes,
-		"newfile": newfile,
-	})
+	// convert file to base64
+
+	// filebase64 := base64.StdEncoding.EncodeToString([]byte(newfile))
+
+	// ctx.JSON(http.StatusOK, gin.H{
+	// 	"Message": "Sucesso!",
+	// 	"file":    filebase64,
+	// })
+
+	ctx.Data(http.StatusOK, http.DetectContentType([]byte(newfile)), []byte(newfile))
 }
 
 func removebg(file []byte, ctx *gin.Context) (string, error) {
